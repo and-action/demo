@@ -1,0 +1,49 @@
+name: Deploy
+on:
+  deployment:
+
+jobs:
+  set-state-in-progress:
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+    steps:
+      - uses: and-action/action-set-deployment-status@v1
+        with:
+          environment: ${{ github.event.deployment.environment }}
+          state: in_progress
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        run: echo "Deploying to ${{ github.event.deployment.environment }}..."
+        # The actual deployment steps are omitted for brevity
+
+  set-state-success:
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+
+    if: success()
+    needs:
+      - deploy
+    steps:
+      - uses: and-action/action-set-deployment-status@v1
+        with:
+          environment: ${{ github.event.deployment.environment }}
+          state: success
+
+  set-state-failure:
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+
+    if: failure()
+    needs:
+      - deploy
+    steps:
+      - uses: and-action/action-set-deployment-status@v1
+        with:
+          environment: ${{ github.event.deployment.environment }}
+          state: failure
