@@ -1,0 +1,21 @@
+actions:
+  # Action workflows that should not appear on the actions dashboard
+  excluded-workflows:
+    - Renovate
+    - Sentry
+
+deployment:
+  environments:
+    - name: dev
+    - name: staging
+      requires:
+        - dev
+    - name: production
+      requires:
+        - staging
+
+  # Action workflows that should not be considered for commit status checks
+  excluded-workflows:
+    - Deploy
+    - Renovate
+    - Sentry
